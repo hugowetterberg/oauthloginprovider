@@ -1,0 +1,66 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_autoload_info().
+ */
+function oauthloginprovider_autoload_info() {
+  return array(
+    'OAuthLoginResource' => array(
+      'file' => 'OAuthLoginResource.php',
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_services_resources().
+ */
+function oauthloginprovider_services_resources() {
+  $res = array(
+    // OAuth login resource
+    'oauthlogin' => ServicesOop::definitionFromClass('OAuthLoginResource'),
+  );
+  return $res;
+}
+
+/**
+ * Implementation of hook_oauth_default_contexts().
+ */
+function oauthloginprovider_oauth_default_contexts() {
+  return array(
+    'oauthlogin' => array(
+      'name' => 'OAuth login',
+      'title' => 'Login to !appname',
+      'message' => 'Hi !user! Click on the "login" button to log in to !appname. This will log you in to !appname and give it access to details like your username and email, but not to your password.',
+      'warning' => 'Click here if you didn\'t ask to be logged in to !appname.',
+      'default_authorization_levels' => array('user_info'),
+      'disable_auth_level_selection' => TRUE,
+      'deny_access_title' => 'Cancel',
+      'grant_access_title' => 'Login',
+      'access_token_lifetime' => 120,
+      'authorization_levels' => array(
+        'user_info' => array(
+          'title' => 'Yes, I want to log in to !appname as !user',
+          'description' => 'This will log you in to !appname and give it access to details like your username and email, but not to your password.',
+        ),
+      )
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_services_endpoints().
+ */
+function oauthloginprovider_services_endpoints() {
+  return array(
+    'oauthlogin' => array(
+      'title' => 'OAuth login API',
+      'server' => 'rest_server',
+      'path' => 'oauthlogin/api',
+      'authentication' => 'services_oauth',
+      'authentication_settings' => array(
+        'oauth_context' => 'oauthlogin',
+      ),
+    ),
+  );
+}

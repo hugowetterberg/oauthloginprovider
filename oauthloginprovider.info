@@ -1,0 +1,11 @@
+; $Id$
+name = OAuth Login Provider
+description = Allows users to log in to other sites through your site using OAuth
+core = 6.x
+version = "6.x-1.0-beta1"
+package = "OAuth Login"
+
+dependencies[] = services_oauth
+dependencies[] = rest_server
+dependencies[] = autoload
+dependencies[] = services_oop

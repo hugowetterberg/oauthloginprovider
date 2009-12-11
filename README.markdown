@@ -1,0 +1,1 @@
+Allows Drupal to act as a OAuth login provider. This module depends wholly on the 3.x branch of services, check out http://goodold.se/blog/tech/future-services-3x to get the lowdown and the links to the dependencies for this module.

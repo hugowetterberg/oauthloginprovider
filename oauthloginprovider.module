@@ -49,18 +49,32 @@ function oauthloginprovider_oauth_default_contexts() {
 }
 
 /**
- * Implementation of hook_services_endpoints().
+ * Implementation of hook_default_services_endpoint().
  */
-function oauthloginprovider_services_endpoints() {
-  return array(
+function oauthloginprovider_default_services_endpoint() {
+  $endpoint = new stdClass();
+  $endpoint->disabled = FALSE;
+  $endpoint->endpoint = 'oauthlogin';
+  $endpoint->title = 'OAuth login API';
+  $endpoint->server = 'rest_server';
+  $endpoint->path = 'oauthlogin/api';
+  $endpoint->authentication = 'services_oauth';
+  $endpoint->authentication_settings = array(
+    'oauth_context' => 'oauthlogin',
+  );
+  $endpoint->resources = array(
     'oauthlogin' => array(
-      'title' => 'OAuth login API',
-      'server' => 'rest_server',
-      'path' => 'oauthlogin/api',
-      'authentication' => 'services_oauth',
-      'authentication_settings' => array(
-        'oauth_context' => 'oauthlogin',
+      'alias' => 'user',
+      'actions' => array(
+        'info' => array(
+          'enabled' => 1,
+          'oauth_credentials' => 'token',
+          'oauth_authorization' => 'user_info',
+        ),
       ),
     ),
   );
+  $endpoints['oauthlogin'] = $endpoint;
+
+  return $endpoints;
 }

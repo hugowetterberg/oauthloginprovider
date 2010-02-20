@@ -26,41 +26,51 @@ function oauthloginprovider_services_resources() {
 /**
  * Implementation of hook_oauth_default_contexts().
  */
-function oauthloginprovider_oauth_default_contexts() {
-  return array(
-    'oauthlogin' => array(
-      'name' => 'OAuth login',
-      'title' => 'Login to !appname',
-      'message' => 'Hi !user! Click on the "login" button to log in to !appname. This will log you in to !appname and give it access to details like your username and email, but not to your password.',
-      'warning' => 'Click here if you didn\'t ask to be logged in to !appname.',
-      'default_authorization_levels' => array('user_info'),
-      'disable_auth_level_selection' => TRUE,
-      'deny_access_title' => 'Cancel',
-      'grant_access_title' => 'Login',
-      'access_token_lifetime' => 120,
-      'authorization_levels' => array(
-        'user_info' => array(
-          'title' => 'Yes, I want to log in to !appname as !user',
-          'description' => 'This will log you in to !appname and give it access to details like your username and email, but not to your password.',
-        ),
-      )
+function oauthloginprovider_default_oauth_common_context() {
+  $contexts = array();
+
+  $context = new stdClass;
+  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
+  $context->name = 'oauthlogin';
+  $context->title = 'OAuth login';
+  $context->authorization_options = array(
+    'access_token_lifetime' => '120',
+    'page_title' => 'Login to @appname',
+    'message' => 'Hi @user! Click on the "login" button to log in to @appname. This will log you in to @appname and give it access to details like your username and email, but not to your password.',
+    'warning' => 'Click here if you didn\'t ask to be logged in to @appname.',
+    'deny_access_title' => 'Cancel',
+    'grant_access_title' => 'Login',
+    'disable_auth_level_selection' => 1,
+    'signature_methods' => array('HMAC-SHA1', 'HMAC-SHA256', 'HMAC-SHA384', 'HMAC-SHA512'),
+    'default_authorization_levels' => array('user_info'),
+  );
+  $context->authorization_levels = array(
+    'user_info' => array(
+      'title' => 'Yes, I want to log in to @appname as @user',
+      'description' => 'This will log you in to @appname and give it access to details like your username and email, but not to your password.',
     ),
   );
+  $contexts[$context->name] = $context;
+
+  return $contexts;
 }
 
 /**
  * Implementation of hook_default_services_endpoint().
  */
 function oauthloginprovider_default_services_endpoint() {
-  $endpoint = new stdClass();
-  $endpoint->disabled = FALSE;
-  $endpoint->endpoint = 'oauthlogin';
+  $endpoints = array();
+
+  $endpoint = new stdClass;
+  $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
+  $endpoint->name = 'oauthlogin';
   $endpoint->title = 'OAuth login API';
   $endpoint->server = 'rest_server';
   $endpoint->path = 'oauthlogin/api';
-  $endpoint->authentication = 'services_oauth';
-  $endpoint->authentication_settings = array(
-    'oauth_context' => 'oauthlogin',
+  $endpoint->authentication = array(
+    'services_oauth' => array(
+      'oauth_context' => 'oauthlogin',
+    ),
   );
   $endpoint->resources = array(
     'oauthlogin' => array(
@@ -68,13 +78,15 @@ function oauthloginprovider_default_services_endpoint() {
       'actions' => array(
         'info' => array(
           'enabled' => 1,
-          'oauth_credentials' => 'token',
-          'oauth_authorization' => 'user_info',
+          'services_oauth' => array(
+            'credentials' => 'token',
+            'authorization' => 'user_info',
+          ),
         ),
       ),
     ),
   );
-  $endpoints['oauthlogin'] = $endpoint;
+  $endpoints[$endpoint->name] = $endpoint;
 
   return $endpoints;
 }
